@@ -1,6 +1,6 @@
 function main() {        
   var list = SpreadsheetApp.openById("*****").getSheetByName("Данные из календаря");       
-  var calendar = CalendarApp.getCalendarById("si86e6ufnh4o90kk8rj4md01a0@group.calendar.google.com"); 
+  var calendar = CalendarApp.getCalendarById("******"); 
   //проверка в каком режиме выполнять загрузку событий из календаря
   var modeLoadingEvents = list.getRange(1, 2).isChecked(); 
   var oneDay;
@@ -19,8 +19,8 @@ function main() {
 
 function secondary () {    
   info = { 
-    list : SpreadsheetApp.openById("**********").getSheetByName("Данные из календаря"),
-    analiticList : SpreadsheetApp.openById("********").getSheetByName("Статистика")
+    list : SpreadsheetApp.openById("********").getSheetByName("Данные из календаря"),
+    analiticList : SpreadsheetApp.openById("*********").getSheetByName("Статистика")
   };    
   
   createRangePerMonth (info);
@@ -140,7 +140,12 @@ function sumTimePerMonth (info){
     var hourStr = arr[0]; //ч
     var hourNum = (arr[0].match(regex))*1;        
         minStr = arr[1]; //мин
-        minNum = (arr[1].match(regex))*1;    
+        try{
+          minNum = (arr[1].match(regex))*1;   
+        } 
+        catch (e){
+          Logger.log(e);
+        }
         minDay = hourNum * 60 + minNum;
         minMonth += minDay;    
   }
