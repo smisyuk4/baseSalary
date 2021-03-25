@@ -19,7 +19,7 @@ function main() {
 
 function secondary () {    
   info = { 
-    list : SpreadsheetApp.openById("********").getSheetByName("Данные из календаря"),
+    list : SpreadsheetApp.openById("*********").getSheetByName("Данные из календаря"),
     analiticList : SpreadsheetApp.openById("*********").getSheetByName("Статистика")
   };    
   
@@ -53,10 +53,17 @@ function pullEvents (oneDay, calendar, list){
       var startTime = events[i].getStartTime();
       var endTime = events[i].getEndTime();
       var min = (endTime - startTime)/60000;
-    
-      list.getRange(lastRow+1, 1).setValue(events[i].getStartTime());      
+
+      list.getRange(lastRow+1, 1).setValue(events[i].getStartTime()); //записывает дату рабочего дня
+
+      //вычитает из общих часов - перерыв 30мин
+      if (min > 480) {
+        min = min - 30;
+        list.getRange(lastRow+1, 4).setValue("Перерыв 30 мин учтён");    
+      }    
+           
       list.getRange(lastRow+1, 2).setValue(converterTime (min));  //переводит минуты в часы и записывает в таблицу      
-      list.getRange(lastRow+1, 3).setValue(min * costMin); //считает зарплату за день
+      list.getRange(lastRow+1, 3).setValue(Math.round(min * costMin)); //считает зарплату за день
     }
   } //конец try
   catch (e){
@@ -84,8 +91,10 @@ function finishMonth (oneDay, list, lastRow){
           ((fullYear % 100 + 2) % (fullYear % 100 + 1)) + (1 - (fullYear % 400 + 2) % (fullYear % 400 + 1)))/numMonth);    
     
   if (todayDate == lastDayMonth){
-    list.getRange(lastRow+2, 1, 1, 6).setBackground("#ffff00");  
-    list.getRange(lastRow+2, 5).setValue("<----- Значения за месяц");    
+    list.getRange(lastRow+2, 4).setValue("Транспорт");    
+    list.getRange(lastRow+3, 4).setValue("Налоги и отчисления");    
+    list.getRange(lastRow+4, 1, 1, 6).setBackground("#ffff00");  
+    list.getRange(lastRow+4, 5).setValue("<----- Значения за месяц");    
   }    
 }
 
@@ -173,8 +182,11 @@ function transferDataToAnaliticList(info) {
   do{
     i++;
     date = info.list.getRange(info.lastRow-i, 1).getValue(); //если она пустая, то взять выше на одну строку
-  }while(date == '')    
-  Logger.log(date);  
+  }while(date == '')
+    
+  Logger.log(date);
+  //var arrayDate = date.split(" ");   
+  //var newArrayDate = arrayDate[0]+ " " +arrayDate[1]+ " " + arrayDate[2]+ " " + arrayDate[3]; //30 ноября 2019 г.
    
   //поиск ячейки в analiticList и запись формулы  
   var lastRowAnaliticList = info.analiticList.getLastRow();  
